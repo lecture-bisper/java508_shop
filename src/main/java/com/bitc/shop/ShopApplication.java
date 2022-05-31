@@ -1,4 +1,4 @@
-package com.bitc.shop.shop;
+package com.bitc.shop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
