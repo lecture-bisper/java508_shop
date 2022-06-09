@@ -9,8 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "member")
-@Data
-public class Member {
+@Data // @Getter, @Setter, @ToString 이 3가지 어노테이션이 합쳐진 것이 @Data
+public class Member extends BaseEntity {
   @Id
   @Column(name = "member_id")
   @GeneratedValue(strategy = GenerationType.AUTO)
