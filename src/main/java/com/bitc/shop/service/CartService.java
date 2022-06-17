@@ -13,6 +13,7 @@ import com.bitc.shop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -63,19 +64,45 @@ public class CartService {
     }
   }
 
+//  현재 장바구니 목록 가져오기
   @Transactional(readOnly = true)
   public List<CartDetailDto> getCartList(String email) {
 
     List<CartDetailDto> cartDetailDtoList = new ArrayList<>();
 
+//    현재 로그인된 사용자 정보 가져오기
     Member member = memberRepository.findByEmail(email);
+//    현재 로그인된 사용자의 장바구니 정보를 가져옴
     Cart cart = cartRepository.findByMemberId(member.getId());
+//    사용자의 장바구니 정보가 없으면 빈 리스트 반환
     if (cart == null) {
       return cartDetailDtoList;
     }
 
+//    장바구니 ID를 기준으로 장바구니에 들어있는 상품 정보를 모두 가져옴
     cartDetailDtoList = cartItemRepository.findCartDetailDtoList(cart.getId());
 
     return cartDetailDtoList;
+  }
+
+  @Transactional(readOnly = true)
+  public boolean validateCartItem(Long cartItemId, String email) {
+    Member curMember = memberRepository.findByEmail(email);
+    CartItem cartItem = cartItemRepository.findById(cartItemId)
+        .orElseThrow(EntityNotFoundException::new);
+    Member savedMember = cartItem.getCart().getMember();
+
+    if (!StringUtils.equals(curMember.getEmail(), savedMember.getEmail())) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public void updateCartItemCount(Long cartItemId, int count) {
+    CartItem cartItem = cartItemRepository.findById(cartItemId)
+        .orElseThrow(EntityNotFoundException::new);
+
+    cartItem.updateCount(count);
   }
 }

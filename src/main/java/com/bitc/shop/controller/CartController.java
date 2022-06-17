@@ -10,10 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -61,5 +58,25 @@ public class CartController {
     model.addAttribute("cartItems", cartDetailList);
 
     return "cart/cartList";
+  }
+
+  @ResponseBody
+//  현재 화면의 일부분만 수정을 진행하므로 PATCH 타입으로 데이터를 전송
+  @RequestMapping(value = "/cartItem/{cartItemId}", method = RequestMethod.PATCH)
+  public ResponseEntity updateCartItem (@PathVariable("cartItemId") Long cartItemId, int count, Principal principal) {
+
+//    변경할 수량을 확인
+    if (count <= 0) {
+      return new ResponseEntity<String>("최소 1개 이상 담아주세요", HttpStatus.BAD_REQUEST);
+    }
+//    현재 사용자의 수정 권한이 있는지 확인
+    else if (!cartService.validateCartItem(cartItemId, principal.getName())) {
+      return new ResponseEntity<String>("수정 권한이 없습니다.", HttpStatus.FORBIDDEN);
+    }
+
+//    선택한 상품의 수량 변경
+    cartService.updateCartItemCount(cartItemId, count);
+
+    return new ResponseEntity<Long>(cartItemId, HttpStatus.OK);
   }
 }
