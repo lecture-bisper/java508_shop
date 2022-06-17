@@ -12,9 +12,12 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderHisDto {
+//  주문 이력에 관련된 데이터를 저장하는 클래스
+//  주문 정보를 가져옴
   public OrderHisDto(Order order) {
     this.orderId = order.getId();
-    this.orderDate = order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:,,:"));
+//    사용자가 지정한 방식으로 날짜 및 시간을 저장
+    this.orderDate = order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     this.orderStatus = order.getOrderStatus();
   }
 
